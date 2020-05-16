@@ -139,6 +139,8 @@ class ProxyCore extends events.EventEmitter {
     if (self.status !== PROXY_STATUS_INIT) {
       throw new Error('server status is not PROXY_STATUS_INIT, can not run start()');
     }
+    // 启动代理服务器若指定了代理的type为https 则需要同时指定代理目标网站的hostname, 然后创建的代理服务器也是https server（并且直接走此代理服务器处理发往目标服务器的请求与响应; 这种情况只能若浏览器输入的目标网站的协议不是https则不会被拦截
+    // 若未指定代理的type为https（也不需要指定hostname）, 则创建的代理服务器是http server;这种情况若浏览器输入的目标网站的协议是https则会走connect事件处理解析出目标网站的hostname, 然后再根据hostname生成证书再创建https server用作后续处理发往目标服务器的请求与响应; 如果浏览器输入的目标网站协议是http那么直接用该代理服务器处理发往目标网站的请求与响应
     async.series(
       [
         //creat proxy server
